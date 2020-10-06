@@ -8,7 +8,6 @@ MIDIIn.connectAll;
 (
 MIDIdef.noteOn(\noteOnTest, {
 	arg vel, nn, chan, src;
-	[vel, nn].postln;
 
 	//Array for multiple notes
 	~notes[nn] = Synth.new(
@@ -23,7 +22,6 @@ MIDIdef.noteOn(\noteOnTest, {
 
 MIDIdef.noteOff(\noteOffTest, {
 	arg vel, nn;
-	[vel, nn].postln;
 
 	//Remove synth when not playing a note
 	~notes[nn].set("gate", 0);
@@ -37,7 +35,8 @@ MIDIdef.noteOff(\noteOffTest, {
 (
 SynthDef.new("Pad", {
 	arg freq = 110, mul = 0.5, gate = 0;
-	var fundSignal, overSignal, overSignal2, overSignal3, underSignal, underSignal2, underSignal3, outSignal, combinedSignal, filterEnv, volumeEnv, filtered, env, finalOut;
+	var fundSignal, overSignal, overSignal2, overSignal3, underSignal, underSignal2, underSignal3, outSignal, combinedSignal, filterEnv, volumeEnv,
+	filtered, env, finalOut;
 	fundSignal = Saw.ar(freq, mul);
 
 	//Unison
@@ -99,7 +98,7 @@ SynthDef.new(
 		arg freq = 220, phase = 0, mult = 0.3, add = 0, gate = 0;
 		var mod, osc, env, osc_left, osc_right, osc_l_1, osc_l_2, osc_l_3, osc_h_1, osc_h_2, osc_h_3, osc_l_4, osc_l_5, osc_l_6, envGate;
 		mod = SinOsc.kr(5, 1.5pi, 0.05, 0.25); // Amplitude oscillation
-		env = Env.new([0, 1, 1, 0], [0.5, 0.5, 5], [-5, 0, 5]); // Envelope
+		env = Env.new([0, 1, 1, 1], [0.5, 0.5, 5], [-5, 0, 5]); // Envelope
 		osc = SinOsc.ar(freq, 0, mod); // Fundamental frequency
 
 		osc_l_1 = Formant.ar(freq,0.5*freq, 1*freq, mod*0.5);
@@ -127,11 +126,10 @@ SynthDef.new(
 		osc = [osc_left, osc_right];
 
 		envGate = EnvGen.kr(Env.adsr(0.01, 0, 1, 0.01, 1), gate, doneAction:2);
-		osc = osc * envGate;
+		osc = osc * envGate * 0.5;
 
 		// Sending oscillator to both audio channels
 		Out.ar(0,osc);
-		Out.ar(1,osc);
 	}
 ).add;
 )
