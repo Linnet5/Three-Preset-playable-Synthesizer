@@ -12,7 +12,7 @@ MIDIdef.noteOn(\noteOnTest, {
 
 	//Array for multiple notes
 	~notes[nn] = Synth.new(
-	"Pad",
+	"Organ",
 	[
 		"freq", nn.midicps,
 		"mul", vel.linexp(1,127,0.05,1),
@@ -92,11 +92,12 @@ SynthDef.new("Sub", {
 }).add;
 )
 
-// Organ
+//*Organ*//
+(
 SynthDef.new(
-	"organ",{
-		arg freq = 220, phase = 0, mult = 0.3, add = 0;
-		var mod, osc, env, osc_left, osc_right, osc_l_1, osc_l_2, osc_l_3, osc_h_1, osc_h_2, osc_h_3, osc_l_4, osc_l_5, osc_l_6;
+	"Organ", {
+		arg freq = 220, phase = 0, mult = 0.3, add = 0, gate = 0;
+		var mod, osc, env, osc_left, osc_right, osc_l_1, osc_l_2, osc_l_3, osc_h_1, osc_h_2, osc_h_3, osc_l_4, osc_l_5, osc_l_6, envGate;
 		mod = SinOsc.kr(5, 1.5pi, 0.05, 0.25); // Amplitude oscillation
 		env = Env.new([0, 1, 1, 0], [0.5, 0.5, 5], [-5, 0, 5]); // Envelope
 		osc = SinOsc.ar(freq, 0, mod); // Fundamental frequency
@@ -125,8 +126,12 @@ SynthDef.new(
 		osc_right = Pan2.ar(osc, 0.5, 0.4);
 		osc = [osc_left, osc_right];
 
+		envGate = EnvGen.kr(Env.adsr(0.01, 0, 1, 0.01, 1), gate, doneAction:2);
+		osc = osc * envGate;
+
 		// Sending oscillator to both audio channels
 		Out.ar(0,osc);
 		Out.ar(1,osc);
 	}
 ).add;
+)
