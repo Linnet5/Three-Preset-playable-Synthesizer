@@ -92,3 +92,41 @@ SynthDef.new("Sub", {
 }).add;
 )
 
+// Organ
+SynthDef.new(
+	"organ",{
+		arg freq = 220, phase = 0, mult = 0.3, add = 0;
+		var mod, osc, env, osc_left, osc_right, osc_l_1, osc_l_2, osc_l_3, osc_h_1, osc_h_2, osc_h_3, osc_l_4, osc_l_5, osc_l_6;
+		mod = SinOsc.kr(5, 1.5pi, 0.05, 0.25); // Amplitude oscillation
+		env = Env.new([0, 1, 1, 0], [0.5, 0.5, 5], [-5, 0, 5]); // Envelope
+		osc = SinOsc.ar(freq, 0, mod); // Fundamental frequency
+
+		osc_l_1 = Formant.ar(freq,0.5*freq, 1*freq, mod*0.5);
+		osc_l_2 = Formant.ar(freq,0.25*freq, 0.5*freq, mod*0.25);
+		osc_l_3 = Formant.ar(freq,0.125*freq, 0.25*freq, mod*0.125);
+		osc_l_4 = LFTri.ar(0.125*freq, 0, mod*0.05);
+		osc_l_5 = LFTri.ar(0.25*freq, 0, mod*0.125);
+		osc_l_6 = LFTri.ar(0.5*freq, 0, mod*0.25);
+		osc_h_1 = SinOsc.ar(2*freq, 0, mod*0.5);
+		osc_h_2 = SinOsc.ar(4*freq, 0, mod*0.25);
+		osc_h_3 = SinOsc.ar(8*freq, 0, mod*0.125);
+
+		osc = osc_l_1 + osc_l_2 + osc_l_3 + osc_l_4 + osc_l_5 + osc_l_6 + osc_h_1 + osc_h_2 + osc_h_3;
+
+		// Effects
+		osc = FreeVerb.ar(osc, 0.33, 1, 0.2, 1); // Reverb
+		// Flanger
+		osc = FreqShift.ar(osc, SinOsc.kr(5, 0, Rand(1,2)*5, 0), 0, 1, 0);
+		osc = FreqShift.ar(osc, SinOsc.kr(1, 0, Rand(1,2), 0), 0, 1, 0);
+		osc = BPeakEQ.ar(osc, 1200, 1, -10, 1, 0); // EQ
+		osc = LPF.ar(osc, 5000, 1, 0); // Low pass filter
+		osc = osc * EnvGen.kr(env, Done.freeSelf);
+		osc_left = Pan2.ar(osc, -0.5, 0.4);
+		osc_right = Pan2.ar(osc, 0.5, 0.4);
+		osc = [osc_left, osc_right];
+
+		// Sending oscillator to both audio channels
+		Out.ar(0,osc);
+		Out.ar(1,osc);
+	}
+).add;
