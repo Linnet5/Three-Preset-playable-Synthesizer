@@ -1,3 +1,4 @@
+(
 //MIDI Functionality//
 MIDIClient.init;
 MIDIIn.connectAll;
@@ -5,13 +6,13 @@ MIDIIn.connectAll;
 //Array for all possible notes on keyboard
 ~notes = Array.newClear(128);
 
-(
+
 MIDIdef.noteOn(\noteOnTest, {
 	arg vel, nn, chan, src;
 
 	//Array for multiple notes
 	~notes[nn] = Synth.new(
-	"Organ",
+	"Pluck",
 	[
 		"freq", nn.midicps,
 		"mul", vel.linexp(1,127,0.05,1),
@@ -134,22 +135,23 @@ SynthDef.new(
 ).add;
 )
 
+//Pluck//
+(
+SynthDef.new("Pluck", {
+	arg freq = 440, mul = 0.8, gate = 0;
+	var env, envGate, mainfreq, overfreq1, overfreq2, octaveUp, octaveDown, underfreq1, underfreq2, combined;
 
-//*90s synth//
-(SynthDef.new("Max", {
-	arg freq = 440;
-	var env, mainfreq, overfreq1, overfreq2, octaveUp, octaveDown, underfreq1, underfreq2, combined;
-
-	env = Line.kr(1, 0, 1, doneAction:2);
+	env = Line.kr(1, 0, 0.4);
+	envGate = EnvGen.kr(Env.adsr(0, 0, 1, 1), gate, doneAction:2);
 
 	//signals
-	mainfreq = LFTri.ar(freq, 0, 0.3);
-	octaveUp = LFTri.ar(freq*2, 0, 0.3);
-	octaveDown = LFTri.ar(freq/2, 0, 0.3);
-	overfreq1= LFSaw.ar(freq*1.005, 0 , 0.3);
-	overfreq2= LFSaw.ar(freq*1.013, 0 , 0.3);
-	underfreq1= LFSaw.ar(freq*0.995, 0 , 0.3);
-	underfreq2= LFSaw.ar(freq*0.987, 0 , 0.3);
+	mainfreq = LFTri.ar(freq, 0, 0.2);
+	octaveUp = LFTri.ar(freq*2, 0, 0.2);
+	octaveDown = LFTri.ar(freq/2, 0, 0.2);
+	overfreq1= LFSaw.ar(freq*1.005, 0 , 0.2);
+	overfreq2= LFSaw.ar(freq*1.013, 0 , 0.2);
+	underfreq1= LFSaw.ar(freq*0.995, 0 , 0.2);
+	underfreq2= LFSaw.ar(freq*0.987, 0 , 0.2);
 
 	combined = mainfreq + octaveUp + octaveDown + overfreq1 + overfreq2 + underfreq1 + underfreq2;
 
@@ -157,7 +159,8 @@ SynthDef.new(
 		Pan2.ar(
 			Decay.ar(
 				Compander.ar(combined, combined, 0.5, 3, 1.8, 0.002,0.1, 1), 0.1, 0.05)));
-	combined = combined*env;
-
-	Out.ar(0,combined);
-}).add;)
+	combined = combined*env*envGate;
+	Out.ar(0,combined*mul);
+}
+).add;
+)
