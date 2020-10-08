@@ -19,7 +19,7 @@ MIDIdef.noteOn(\noteOnTest, {
 
 	//Array for multiple notes
 	~notes[nn] = Synth.new(
-	"Pluck",
+		"Pluck", //CHANGE THIS LINE TO THE TITLE OF THE INSTRUMENT YOU WISH TO USE "Pluck", "Organ" or "Pad"
 	[
 		"freq", nn.midicps,
 		"mul", vel.linexp(1,127,0.05,1),
