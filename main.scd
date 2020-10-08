@@ -1,3 +1,10 @@
+/*
+Three-Preset playable Synthesizer. Requires MIDI-input device.
+Authors: Linus Karlsson, Ruben Bromée, Max Benecke
+Version: 1.0
+Date: 2020-10-08
+*/
+
 (
 //MIDI Functionality//
 MIDIClient.init;
