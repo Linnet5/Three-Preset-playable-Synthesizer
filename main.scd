@@ -93,7 +93,7 @@ SynthDef.new("Sub", {
 
 	env = EnvGen.kr(Env.adsr(0.01, 0, 1, 0.01, 1), gate, doneAction:2);
 	signal = SinOsc.ar(freq, 0, mul) * env;
-	signal = LPF.ar(signal, 500);
+	signal = LPF.ar(signal, 70);
 
 	Out.ar(0, signal);
 	Out.ar(1, signal);
